@@ -1,0 +1,95 @@
+module rx_fifo(
+    input                clk,                  // System clock
+    input                reset_n,              // Active-low reset
+    input                tx_valid,              // TX side valid (enables RX)
+    input                rx_pkt_valid,          // Incoming packet valid
+    input                cxs_crd_gnt,            // Credit grant from downstream
+    input                cxs_rx_active_ack,      // RX active acknowledgment
+    input        [511:0] rx_pkt_data,           // Incoming packet data (512-bit)
+    output logic         rx_ready,               // Ready to accept RX data
+    output logic         fifo_full,              // FIFO full indicator
+    output logic         fifo_empty,             // FIFO empty indicator
+    output logic         fifo_out_valid,          // FIFO output valid
+    output logic [1:0]   pkt_receive_sts,        // Packet receive status
+    output logic [511:0] fifo_data_out           // FIFO output data
+);
+    logic fifo_wr_en;        // FIFO write enable
+    logic fifo_rd_en;        // FIFO read enable
+    logic flit_en;           // Indicates flit consumption
+    logic flit_valid;        // Indicates valid flit
+    // Registered versions of handshake signals (for alignment)
+    logic [1:0] cxs_rx_active_ack_r;
+    logic [1:0] cxs_crd_gnt_r;
+    // FIFO pointers
+    logic [3:0] wr_ptr;     // Write pointer (depth = 9)
+    logic [3:0] rd_ptr;     // Read pointer
+
+    // Credit and FIFO depth tracking
+    logic [4:0] credit_outstanding;
+  //   logic [4:0] fifo_depth;
+    logic [511:0] fifo_mem [0:8];
+    assign flit_valid = fifo_out_valid;            // All stored flits are assumed valid
+    assign flit_en    = fifo_out_valid;  // Consume flit when output is valid
+    // FIFO is full when next write pointer equals read pointer
+  assign fifo_full  = ((wr_ptr+1 )== rd_ptr);  
+    // FIFO is empty when write and read pointers are equal
+    assign fifo_empty = (wr_ptr == rd_ptr);
+  
+  always_ff @ (posedge clk or negedge reset_n)
+    if(!reset_n) fifo_wr_en <= 1'b0;
+    else fifo_wr_en <= (rx_pkt_valid & rx_ready & (!fifo_full));
+  
+  always_ff @ (posedge clk or negedge reset_n)
+    if(!reset_n) cxs_rx_active_ack_r <=2'h0;
+  else  cxs_rx_active_ack_r <= {cxs_rx_active_ack_r[0],cxs_rx_active_ack};
+   always_ff @ (posedge clk or negedge reset_n)
+     if(!reset_n) cxs_crd_gnt_r <=2'h0;
+  else  cxs_crd_gnt_r <= {cxs_crd_gnt_r[0],cxs_crd_gnt};
+  
+   always_ff @(posedge clk or negedge reset_n)
+    if(!reset_n) fifo_rd_en =1'b0;
+  else if ((!fifo_empty) & cxs_crd_gnt & cxs_rx_active_ack) fifo_rd_en =1'b1;
+     else if ((!cxs_crd_gnt_r[1]) | (!cxs_rx_active_ack_r[1])| fifo_empty) fifo_rd_en = 1'b0;
+   
+    // Packet receive status
+    always_ff @(posedge clk or negedge reset_n)
+        if (!reset_n)  pkt_receive_sts <= 2'b00;
+        else 
+          begin
+            pkt_receive_sts <= 2'b00;
+            if (fifo_wr_en) pkt_receive_sts <= 2'b01;
+            else if (rx_pkt_valid & (!rx_ready))  pkt_receive_sts <= 2'b10;
+          end
+
+  
+    always_ff @(posedge clk or negedge reset_n)
+      if (!reset_n)  credit_outstanding <= 5'h0;
+        else if (flit_en)  credit_outstanding <= credit_outstanding - 1'b1;
+        else if (rx_ready)  credit_outstanding <= credit_outstanding + 1'b1;
+    // RX ready logic
+   always_ff @(posedge clk or negedge reset_n)
+     if (!reset_n) rx_ready <= 1'b0;
+  else if  (!tx_valid | fifo_full) rx_ready <=1'b0;
+ // else if (credit_outstanding >= fifo_depth)  rx_ready <= 1'b0;
+  else if (tx_valid & (!fifo_full)) rx_ready <= 1'b1;
+     
+    // FIFO write
+    always_ff @(posedge clk or negedge reset_n)
+      if (!reset_n) 	fifo_mem[wr_ptr] <= 512'h0;
+  else fifo_mem[wr_ptr] <= (rx_pkt_valid & rx_ready & (!fifo_full)) ? rx_pkt_data : fifo_mem[wr_ptr];
+  //      else fifo_mem[wr_ptr] <= (-_wr_en)? rx_pkt_data : fifo_mem[wr_ptr];       
+    always_ff @(posedge clk or negedge reset_n)
+        if (!reset_n) 	wr_ptr <= 4'h0;
+	else  		wr_ptr <= (wr_ptr == 4'h8) ? 4'h0 : (rx_pkt_valid & rx_ready & (!fifo_full)) ? wr_ptr + 4'h1: wr_ptr ;
+    // FIFO read 
+    always_ff @(posedge clk or negedge reset_n)
+        if (!reset_n) 	rd_ptr <= 4'h0;
+  else	rd_ptr <= (rd_ptr == 4'h8) ? 4'h0 : (fifo_rd_en) ? rd_ptr + 4'h1: rd_ptr ;
+    always_ff @(posedge clk or negedge reset_n)
+       if (!reset_n) fifo_out_valid <= 1'b0;
+       else fifo_out_valid <= fifo_rd_en;
+    always_ff @(posedge clk or negedge reset_n)
+      if (!reset_n) fifo_data_out <= 512'h0; 
+     else   fifo_data_out  <= fifo_rd_en ? fifo_mem[rd_ptr]: 512'h0;
+  
+endmodule
