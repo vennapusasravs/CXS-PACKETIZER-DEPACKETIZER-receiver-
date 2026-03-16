@@ -79,7 +79,10 @@ module rx_fifo(
     always_ff @(posedge clk or negedge reset_n)
       if (!reset_n) 	fifo_mem[wr_ptr] <= 512'h0;
   else fifo_mem[wr_ptr] <= (rx_pkt_valid & rx_ready & (!fifo_full)) ? rx_pkt_data : fifo_mem[wr_ptr];
+<<<<<<< HEAD
        
+=======
+>>>>>>> 15623c55d823c3141d661eed5f87a1203396db59
     always_ff @(posedge clk or negedge reset_n)
         if (!reset_n) 	wr_ptr <= 4'h0;
 	else  		wr_ptr <= (wr_ptr == 4'h8) ? 4'h0 : (rx_pkt_valid & rx_ready & (!fifo_full)) ? wr_ptr + 4'h1: wr_ptr ;
