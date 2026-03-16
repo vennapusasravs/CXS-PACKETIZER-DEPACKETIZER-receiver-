@@ -6,8 +6,8 @@
 // Top module connecting FIFO and Packet Decoder
 //-------------------------------------------------------------
 module rx_top (
-    input  clk,                     // system clock
-    input  reset_n,                 // active-low reset
+    input  cxs_clk,                     // system clock
+    input  cxs_rst_n,                 // active-low reset
     input  tx_valid,                // transmitter valid signal
     input  rx_pkt_valid,            // packet valid from RX
     input  [511:0] rx_pkt_data,     // incoming 512-bit packet
@@ -42,8 +42,8 @@ module rx_top (
     // FIFO Instance
     //---------------------------------------------------------
     rx_fifo rx_fifo_inst (
-        .clk               (clk),
-        .reset_n           (reset_n),
+        .clk               (cxs_clk),
+        .reset_n           (cxs_rst_n),
         .tx_valid          (tx_valid),
         .rx_pkt_valid      (rx_pkt_valid),
         .cxs_crd_gnt       (cxs_crd_gnt),
@@ -60,8 +60,8 @@ module rx_top (
     // Packet Decoder Instance
     //---------------------------------------------------------
     rx_pkt_dec rx_pkt_dec_inst(
-        .clk               (clk),
-        .reset_n           (reset_n),
+        .clk               (cxs_clk),
+        .reset_n           (cxs_rst_n),
         .tx_valid          (tx_valid),
         .rx_ready          (rx_ready),
         .fifo_empty        (fifo_empty),
