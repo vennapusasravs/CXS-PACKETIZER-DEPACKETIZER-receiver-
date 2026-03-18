@@ -36,7 +36,7 @@ rx_top dut(
     .rx_ready(rx_ready),
     .pkt_receive_sts_vld(pkt_receive_sts_vld),
     .pkt_receive_sts(pkt_receive_sts),
-  .cxs_rx_crd_rtn(cxs_rx_crd_rtn),
+    .cxs_rx_crd_rtn(cxs_rx_crd_rtn),
     .cxs_last(cxs_last),
     .cxs_prcl_type(cxs_prcl_type),
   .cxs_cntl(cxs_cntl)
@@ -119,3 +119,4 @@ initial begin
 end
 
 endmodule
+ 
