@@ -9,7 +9,8 @@ module rx_fifo(
     output logic         rx_ready,               // Ready to accept RX data
     output logic         fifo_full,              // FIFO full indicator
     output logic         fifo_empty,             // FIFO empty indicator
-    output logic         fifo_out_valid,          // FIFO output valid
+    output logic         fifo_out_valid,    // FIFO output valid
+    output logic         pkt_receive_sts_vld,
     output logic [1:0]   pkt_receive_sts,        // Packet receive status
     output logic [511:0] fifo_data_out           // FIFO output data
 );
