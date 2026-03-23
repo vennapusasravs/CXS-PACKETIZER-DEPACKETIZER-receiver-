@@ -26,7 +26,7 @@ module rx_fifo(
     logic [6:0] rd_ptr;     // Read pointer
 
     // Credit and FIFO depth tracking
-    logic [4:0] credit_outstanding;
+	logic [7:0] credit_outstanding;
   //   logic [4:0] fifo_depth;
     logic [511:0] fifo_mem [0:127];
     assign flit_valid = fifo_out_valid;            // All stored flits are assumed valid
