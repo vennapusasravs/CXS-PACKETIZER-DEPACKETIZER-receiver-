@@ -67,6 +67,7 @@ logic depkt_rx_data_vld;
     .depkt_rx_data(depkt_rx_data),
     .cxs_last(cxs_last),
     .cxs_cntl(cxs_cntl),
+    .cxs_prcl_type(cxs_prcl_type),
     .cxs_valid(cxs_valid),
     .cxs_data(cxs_data));
   
