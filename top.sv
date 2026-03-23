@@ -81,8 +81,8 @@ logic depkt_rx_data_vld;
   );
 
   
-   always_ff @(posedge clk or negedge reset_n) 
-    if (!reset_n)  cxs_prcl_type <= 3'b0;
-      else cxs_prcl_type <= pkt_data_rx_vld? fifo_data_out[51:49]:3'b0;
+  // always_ff @(posedge clk or negedge reset_n) 
+   // if (!reset_n)  cxs_prcl_type <= 3'b0;
+    //  else cxs_prcl_type <= pkt_data_rx_vld? fifo_data_out[51:49]:3'b0;
 
     endmodule
