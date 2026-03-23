@@ -51,6 +51,7 @@ module rx_fifo(
     if(!reset_n) fifo_rd_en =1'b0;
   else if ((!fifo_empty) & cxs_crd_gnt & cxs_rx_active_ack) fifo_rd_en =1'b1;
      else if ((!cxs_crd_gnt_r[1]) | (!cxs_rx_active_ack_r[1])| fifo_empty) fifo_rd_en = 1'b0;
+  assign pkt_receive_sts_vld = (fifo_wr_en | (rx_pkt_valid & (!rx_ready)));
    
     // Packet receive status
     always_ff @(posedge clk or negedge reset_n)
