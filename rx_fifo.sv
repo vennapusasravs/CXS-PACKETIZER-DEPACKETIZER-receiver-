@@ -22,13 +22,13 @@ module rx_fifo(
     logic [1:0] cxs_rx_active_ack_r;
     logic [1:0] cxs_crd_gnt_r;
     // FIFO pointers
-    logic [3:0] wr_ptr;     // Write pointer (depth = 9)
-    logic [3:0] rd_ptr;     // Read pointer
+    logic [6:0] wr_ptr;     // Write pointer 
+    logic [6:0] rd_ptr;     // Read pointer
 
     // Credit and FIFO depth tracking
     logic [4:0] credit_outstanding;
   //   logic [4:0] fifo_depth;
-    logic [511:0] fifo_mem [0:8];
+    logic [511:0] fifo_mem [0:127];
     assign flit_valid = fifo_out_valid;            // All stored flits are assumed valid
     assign flit_en    = fifo_out_valid;  // Consume flit when output is valid
     // FIFO is full when next write pointer equals read pointer
@@ -51,9 +51,12 @@ module rx_fifo(
     if(!reset_n) fifo_rd_en =1'b0;
   else if ((!fifo_empty) & cxs_crd_gnt & cxs_rx_active_ack) fifo_rd_en =1'b1;
      else if ((!cxs_crd_gnt_r[1]) | (!cxs_rx_active_ack_r[1])| fifo_empty) fifo_rd_en = 1'b0;
-  assign pkt_receive_sts_vld = (fifo_wr_en | (rx_pkt_valid & (!rx_ready)));
    
     // Packet receive status
+always_ff @(posedge clk or negedge reset_n) 
+    if (!reset_n)  pkt_receive_sts_vld <= 1'b0;
+    else  pkt_receive_sts_vld <= (fifo_wr_en | (rx_pkt_valid & (!rx_ready)));
+   
     always_ff @(posedge clk or negedge reset_n)
         if (!reset_n)  pkt_receive_sts <= 2'b00;
         else 
@@ -81,12 +84,12 @@ module rx_fifo(
   else fifo_mem[wr_ptr] <= (rx_pkt_valid & rx_ready & (!fifo_full)) ? rx_pkt_data : fifo_mem[wr_ptr];
   //      else fifo_mem[wr_ptr] <= (-_wr_en)? rx_pkt_data : fifo_mem[wr_ptr];       
     always_ff @(posedge clk or negedge reset_n)
-        if (!reset_n) 	wr_ptr <= 4'h0;
-	else  		wr_ptr <= (wr_ptr == 4'h8) ? 4'h0 : (rx_pkt_valid & rx_ready & (!fifo_full)) ? wr_ptr + 4'h1: wr_ptr ;
+        if (!reset_n) 	wr_ptr <= 7'h0;
+	else  		wr_ptr <= (wr_ptr == 7'h8) ? 7'h0 : (rx_pkt_valid & rx_ready & (!fifo_full)) ? wr_ptr + 7'h1: wr_ptr ;
     // FIFO read 
     always_ff @(posedge clk or negedge reset_n)
-        if (!reset_n) 	rd_ptr <= 4'h0;
-  else	rd_ptr <= (rd_ptr == 4'h8) ? 4'h0 : (fifo_rd_en) ? rd_ptr + 4'h1: rd_ptr ;
+        if (!reset_n) 	rd_ptr <= 7'h0;
+  else	rd_ptr <= (rd_ptr == 7'h8) ? 7'h0 : (fifo_rd_en) ? rd_ptr + 7'h1: rd_ptr ;
     always_ff @(posedge clk or negedge reset_n)
        if (!reset_n) fifo_out_valid <= 1'b0;
        else fifo_out_valid <= fifo_rd_en;
