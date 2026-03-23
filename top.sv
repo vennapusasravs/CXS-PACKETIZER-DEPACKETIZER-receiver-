@@ -31,8 +31,8 @@ logic depkt_rx_data_vld;
   logic rx_pkt_dec_vld;
   logic [255:0] depkt_rx_data;
  logic pkt_data_rx_vld;
-  logic clk;
-  logic reset_n;
+  
+
   logic cxs_rx_crd_rtn_r;
   
   rx_fifo rx_fifo_inst (
