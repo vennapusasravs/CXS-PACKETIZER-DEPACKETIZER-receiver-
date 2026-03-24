@@ -3,8 +3,8 @@
 `include "rx_pkt_dec.sv"
 `include "crd_cntl.sv"
 module rx_top(
- input  cxs_clk,
- input cxs_rst_n,
+ input  rx_cxs_clk,
+ input rx_cxs_rst_n,
  input           tx_valid,
   input           rx_pkt_valid, //input
     input  [511:0] rx_pkt_data,
@@ -36,8 +36,8 @@ logic depkt_rx_data_vld;
   logic rx_cxs_crd_rtn_r;
   
   rx_fifo rx_fifo_inst (
-    .clk(cxs_clk),
-    .reset_n(cxs_rst_n),
+    .clk(rx_cxs_clk),
+    .reset_n(rx_cxs_rst_n),
     .tx_valid(tx_valid),
     .rx_pkt_valid(rx_pkt_valid),
     .rx_cxs_crd_gnt(rx_cxs_crd_gnt),
@@ -53,8 +53,8 @@ logic depkt_rx_data_vld;
   
     
   rx_pkt_dec rx_pkt_dec_inst(
-    .clk(cxs_clk),               
-    . reset_n(cxs_rst_n),             
+    .clk(rx_cxs_clk),               
+    . reset_n(rx_cxs_rst_n),             
     .tx_valid(tx_valid),        
     .rx_ready(rx_ready),
     .fifo_empty(fifo_empty),
@@ -72,8 +72,8 @@ logic depkt_rx_data_vld;
     .rx_cxs_data(rx_cxs_data));
   
   credit_control u_credit_control (
-    .clk                  (cxs_clk),
-    .reset_n              (cxs_rst_n),
+    .clk                  (rx_cxs_clk),
+    .reset_n              (rx_cxs_rst_n),
     .rx_cxs_valid            (rx_cxs_valid),
       .rx_cxs_active_req    (rx_cxs_active_req),
       .depkt_rx_data_vld    (depkt_rx_data_vld),
