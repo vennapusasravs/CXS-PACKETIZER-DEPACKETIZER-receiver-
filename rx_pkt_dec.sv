@@ -6,18 +6,18 @@ module rx_pkt_dec (
     input        rx_ready,
     input        fifo_empty,
     input        fifo_full,
-    input     cxs_crd_gnt,
+    input     rx_cxs_crd_gnt,
     input        fifo_out_valid,    // fifo has valid data
     input  [511:0] fifo_data_out,     // fifo 512-bit data
-    output logic cxs_rx_active_req,
-    output  logic [51:49] cxs_prcl_type,
+    output logic rx_cxs_active_req,
+    output  logic [51:49] rx_cxs_prcl_type,
     output logic rx_pkt_dec_vld,
-    output  logic cxs_valid,
-    output logic cxs_last ,
-    output logic [13:0] cxs_cntl,
+    output  logic rx_cxs_valid,
+    output logic rx_cxs_last ,
+    output logic [13:0] rx_cxs_cntl,
     output logic depkt_rx_data_vld,
     output logic [255:0] depkt_rx_data,
-    output logic [255:0] cxs_data);
+    output logic [255:0] rx_cxs_data);
     logic cxs_last_rx_vld;
     logic cxs_cntl_rx_vld;
     logic cxs_last_rx;
@@ -28,7 +28,7 @@ module rx_pkt_dec (
     logic pkt_data_rx_vld;
     logic cxs_data_flitwidth_rx_vld;
     logic cxs_max_pkt_perflit_rx_vld;
-    logic cxs_prcl_type_vld;
+    logic rx_cxs_prcl_type_vld;
     logic[1:0] cxs_data_flitwidth_rx;
     logic [1:0] cxs_max_pkt_perflit_rx;
     logic [13:0] cxs_cntl_rx;
@@ -46,7 +46,7 @@ module rx_pkt_dec (
       
       assign {cxs_max_pkt_perflit_rx_vld,cxs_max_pkt_perflit_rx} = (fifo_out_valid) ? {1'b1,fifo_data_out[48:47]} : 3'h0;
       
-      assign {cxs_prcl_type_vld,cxs_prcl_type} = (fifo_out_valid) ? {1'b1,fifo_data_out[51:49]} : 4'h0;
+      assign {rx_cxs_prcl_type_vld,rx_cxs_prcl_type} = (fifo_out_valid) ? {1'b1,fifo_data_out[51:49]} : 4'h0;
       
       assign {dp_rx_vld,dp_rx}     = (fifo_out_valid) ? {1'b1,fifo_data_out[255]} : 2'h0;
       
@@ -65,27 +65,27 @@ module rx_pkt_dec (
       else  {depkt_rx_data_vld,depkt_rx_data}	 <= pkt_data_rx_vld ? {1'b1,pkt_data_rx[255:0]} :257'h0	;
 
       always_ff @(posedge clk or negedge reset_n)
-      if(!reset_n) cxs_rx_active_req <= 1'b0;
-      else if (fifo_empty) cxs_rx_active_req <=1'b0;
-      else if (!fifo_empty)  cxs_rx_active_req <= 1'b1;
-   //  else if (fifo_empty & (!depkt_rx_data_vld)) cxs_rx_active_req <= 1'b0;
-      else cxs_rx_active_req <=1'b0;
+      if(!reset_n) rx_cxs_active_req <= 1'b0;
+      else if (fifo_empty) rx_cxs_active_req <=1'b0;
+      else if (!fifo_empty)  rx_cxs_active_req <= 1'b1;
+   //  else if (fifo_empty & (!depkt_rx_data_vld)) rx_cxs_active_req <= 1'b0;
+      else rx_cxs_active_req <=1'b0;
       
       always_ff @(posedge clk or negedge reset_n)
-        if(!reset_n) cxs_last <= 1'b0;
-      else  cxs_last <= depkt_rx_data_vld ? cxs_last_rx : 1'b0;
+        if(!reset_n) rx_cxs_last <= 1'b0;
+      else  rx_cxs_last <= depkt_rx_data_vld ? cxs_last_rx : 1'b0;
       
       always_ff @(posedge clk or negedge reset_n)
-        if(!reset_n) cxs_cntl <= 14'h0;
-      else  cxs_cntl <=  depkt_rx_data_vld ? cxs_cntl_rx : 14'h0; 
+        if(!reset_n) rx_cxs_cntl <= 14'h0;
+      else  rx_cxs_cntl <=  depkt_rx_data_vld ? cxs_cntl_rx : 14'h0; 
       
      always_ff @(posedge clk or negedge reset_n) 
-    if (!reset_n)  cxs_valid <= 1'b0;
-    else cxs_valid <= depkt_rx_data_vld? depkt_rx_data_vld:1'b0;
+    if (!reset_n)  rx_cxs_valid <= 1'b0;
+    else rx_cxs_valid <= depkt_rx_data_vld? depkt_rx_data_vld:1'b0;
   
   always_ff @(posedge clk or negedge reset_n) 
-    if (!reset_n)  cxs_data <= 256'h0;
-      else   cxs_data <= depkt_rx_data_vld ? depkt_rx_data:256'h0;
+    if (!reset_n)  rx_cxs_data <= 256'h0;
+      else   rx_cxs_data <= depkt_rx_data_vld ? depkt_rx_data:256'h0;
       
         
 endmodule

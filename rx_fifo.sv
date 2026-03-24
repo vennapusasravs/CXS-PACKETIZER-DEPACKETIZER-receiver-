@@ -3,8 +3,8 @@ module rx_fifo(
     input                reset_n,              // Active-low reset
     input                tx_valid,              // TX side valid (enables RX)
     input                rx_pkt_valid,          // Incoming packet valid
-    input                cxs_crd_gnt,            // Credit grant from downstream
-    input                cxs_rx_active_ack,      // RX active acknowledgment
+    input                rx_cxs_crd_gnt,            // Credit grant from downstream
+    input                rx_cxs_active_ack,      // RX active acknowledgment
     input        [511:0] rx_pkt_data,           // Incoming packet data (512-bit)
     output logic         rx_ready,               // Ready to accept RX data
     output logic         fifo_full,              // FIFO full indicator
@@ -19,8 +19,8 @@ module rx_fifo(
     logic flit_en;           // Indicates flit consumption
     logic flit_valid;        // Indicates valid flit
     // Registered versions of handshake signals (for alignment)
-    logic [1:0] cxs_rx_active_ack_r;
-    logic [1:0] cxs_crd_gnt_r;
+    logic [1:0] rx_cxs_active_ack_r;
+    logic [1:0] rx_cxs_crd_gnt_r;
     // FIFO pointers
     logic [6:0] wr_ptr;     // Write pointer 
     logic [6:0] rd_ptr;     // Read pointer
@@ -41,16 +41,16 @@ module rx_fifo(
     else fifo_wr_en <= (rx_pkt_valid & rx_ready & (!fifo_full));
   
   always_ff @ (posedge clk or negedge reset_n)
-    if(!reset_n) cxs_rx_active_ack_r <=2'h0;
-  else  cxs_rx_active_ack_r <= {cxs_rx_active_ack_r[0],cxs_rx_active_ack};
+    if(!reset_n) rx_cxs_active_ack_r <=2'h0;
+  else  rx_cxs_active_ack_r <= {rx_cxs_active_ack_r[0],rx_cxs_active_ack};
    always_ff @ (posedge clk or negedge reset_n)
-     if(!reset_n) cxs_crd_gnt_r <=2'h0;
-  else  cxs_crd_gnt_r <= {cxs_crd_gnt_r[0],cxs_crd_gnt};
+     if(!reset_n) rx_cxs_crd_gnt_r <=2'h0;
+  else  rx_cxs_crd_gnt_r <= {rx_cxs_crd_gnt_r[0],rx_cxs_crd_gnt};
   
    always_ff @(posedge clk or negedge reset_n)
     if(!reset_n) fifo_rd_en =1'b0;
-  else if ((!fifo_empty) & cxs_crd_gnt & cxs_rx_active_ack) fifo_rd_en =1'b1;
-     else if ((!cxs_crd_gnt_r[1]) | (!cxs_rx_active_ack_r[1])| fifo_empty) fifo_rd_en = 1'b0;
+  else if ((!fifo_empty) & rx_cxs_crd_gnt & rx_cxs_active_ack) fifo_rd_en =1'b1;
+     else if ((!rx_cxs_crd_gnt_r[1]) | (!rx_cxs_active_ack_r[1])| fifo_empty) fifo_rd_en = 1'b0;
    
     // Packet receive status
 always_ff @(posedge clk or negedge reset_n) 

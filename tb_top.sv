@@ -5,20 +5,20 @@ logic cxs_rst_n;
 logic tx_valid;
 logic rx_pkt_valid;
 logic [511:0] rx_pkt_data;
-logic cxs_crd_gnt;
+logic rx_cxs_crd_gnt;
 //logic  pkt_data_rx_vld;
-logic cxs_rx_active_ack;
-logic cxs_deactive_hint;
-logic cxs_rx_active_req;
-logic cxs_valid;
-logic [255:0] cxs_data;
+logic rx_cxs_active_ack;
+logic rx_cxs_deactive_hint;
+logic rx_cxs_active_req;
+logic rx_cxs_valid;
+logic [255:0] rx_cxs_data;
 logic rx_ready;
 logic pkt_receive_sts_vld;
 logic [1:0] pkt_receive_sts;
-logic cxs_rx_crd_rtn;
-logic cxs_last;
-logic [2:0] cxs_prcl_type;
-  logic [13:0] cxs_cntl;
+logic rx_cxs_crd_rtn;
+logic rx_cxs_last;
+logic [2:0] rx_cxs_prcl_type;
+  logic [13:0] rx_cxs_cntl;
 //  logic  cxs_cntl_rsvd_rx_vld ;
 //  logic   cxs_rsvd_rx_vld      ;
 rx_top dut(
@@ -27,19 +27,19 @@ rx_top dut(
     .tx_valid(tx_valid),
     .rx_pkt_valid(rx_pkt_valid),
     .rx_pkt_data(rx_pkt_data),
-    .cxs_crd_gnt(cxs_crd_gnt),
-    .cxs_rx_active_ack(cxs_rx_active_ack),
-    .cxs_deactive_hint(cxs_deactive_hint),
-    .cxs_rx_active_req(cxs_rx_active_req),
-    .cxs_valid(cxs_valid),
-    .cxs_data(cxs_data),
+    .rx_cxs_crd_gnt(rx_cxs_crd_gnt),
+    .rx_cxs_active_ack(rx_cxs_active_ack),
+    .rx_cxs_deactive_hint(rx_cxs_deactive_hint),
+    .rx_cxs_active_req(rx_cxs_active_req),
+    .rx_cxs_valid(rx_cxs_valid),
+    .rx_cxs_data(rx_cxs_data),
     .rx_ready(rx_ready),
     .pkt_receive_sts_vld(pkt_receive_sts_vld),
     .pkt_receive_sts(pkt_receive_sts),
-    .cxs_rx_crd_rtn(cxs_rx_crd_rtn),
-    .cxs_last(cxs_last),
-    .cxs_prcl_type(cxs_prcl_type),
-  .cxs_cntl(cxs_cntl)
+    .rx_cxs_crd_rtn(rx_cxs_crd_rtn),
+    .rx_cxs_last(rx_cxs_last),
+    .rx_cxs_prcl_type(rx_cxs_prcl_type),
+  .rx_cxs_cntl(rx_cxs_cntl)
 );
 
 
@@ -53,9 +53,9 @@ initial begin
     tx_valid = 1'b0;
     rx_pkt_valid = 1'b0;
     rx_pkt_data = 512'h0;
-    cxs_crd_gnt = 1'b0;
-    cxs_rx_active_ack = 1'b0;
-  cxs_deactive_hint = 1'b0; 
+    rx_cxs_crd_gnt = 1'b0;
+    rx_cxs_active_ack= 1'b0;
+  rx_cxs_deactive_hint = 1'b0; 
 //    cxs_cntl_rsvd_rx_vld = 1'b0;
 //     cxs_rsvd_rx_vld      = 1'b0;
  
@@ -86,12 +86,12 @@ initial begin
 
     #10;
   @(posedge cxs_clk);
-  wait(cxs_rx_active_req);
+  wait(rx_cxs_active_req);
     rx_pkt_valid=1'b1;
    //wait(cxs_rx_active_req);
-    cxs_crd_gnt = 1'b1;
+    rx_cxs_crd_gnt = 1'b1;
   @(posedge cxs_clk);
-    cxs_rx_active_ack = 1'b1;
+    rx_cxs_active_ack = 1'b1;
   @(posedge cxs_clk);
     rx_pkt_data = 512'h8888_8880_7777_6666_5555_1111_3333_4444_5566;
   @(posedge cxs_clk);
@@ -102,7 +102,7 @@ initial begin
   @(posedge cxs_clk);
     rx_pkt_valid = 1'b0;
     rx_pkt_data =512'h0;
-    cxs_deactive_hint = 1'b1; 
+    rx_cxs_deactive_hint = 1'b1; 
    // cxs_crd_gnt=1'b0;
 
 
