@@ -1,6 +1,8 @@
+// Code your testbench here
+// or browse Examples
 `timescale 1ns/1ps
 // --------------------------- TESTBENCH FOR RX_TOP ---------------------------
-module tb_rx_top;
+module tb_top_cxs_pktzr_depktzr_rx;
     // ---------------- CLOCK & RESET ----------------
     logic rx_cxs_clk;                 // System clock
     logic rx_cxs_rst_n;               // Active-low rese
@@ -24,7 +26,7 @@ module tb_rx_top;
     logic [13:0] rx_cxs_cntl;         // Control field
 
     // ---------------- DUT INSTANTIATION ----------------
-    rx_top dut (
+    top_cxs_pktzr_depktzr_rx dut (
         .rx_cxs_clk           (rx_cxs_clk),
         .rx_cxs_rst_n         (rx_cxs_rst_n),
         .tx_valid             (tx_valid),
@@ -69,6 +71,7 @@ module tb_rx_top;
         // ---------- WAIT FOR READY ----------
         @(posedge rx_cxs_clk);
         @(posedge rx_cxs_clk);
+		@(posedge rx_cxs_clk);
         wait(rx_ready);
         // ---------- SEND FIRST PACKET ----------
         rx_pkt_valid = 1'b1;
@@ -96,7 +99,7 @@ module tb_rx_top;
     // ---------------- WAVEFORM DUMP ----------------
     initial begin
         $dumpfile("dump.vcd");        // Output VCD file
-        $dumpvars(0, tb_rx_top);      // Dump all signals
+        $dumpvars(0, tb_top_cxs_pktzr_depktzr_rx);      // Dump all signals
     end
 
 endmodule

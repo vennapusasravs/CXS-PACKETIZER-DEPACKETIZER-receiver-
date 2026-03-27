@@ -1,10 +1,11 @@
 // Code your design here
+// Code your design here
 
-//`include "rx_fifo.sv"
-//`include "rx_pkt_dec.sv"
-//`include "rx_crd_cntl.sv"
+`include "rx_fifo.sv"
+`include "rx_pkt_dec.sv"
+`include "rx_crd_cntl.sv"
 
-module rx_top(
+module top_cxs_pktzr_depktzr_rx(
     // ---------------- INPUT SIGNALS ----------------
     input  rx_cxs_clk,                 // System clock
     input  rx_cxs_rst_n,               // Active-low reset
