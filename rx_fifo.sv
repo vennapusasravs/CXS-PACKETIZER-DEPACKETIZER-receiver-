@@ -58,11 +58,9 @@ always_ff @(posedge clk or negedge reset_n)
 
 always_ff @(posedge clk or negedge reset_n)
     if (!reset_n) pkt_receive_sts <= 2'b00;       // reset status                    
-    else begin
-        pkt_receive_sts <= 2'b00;                 // default                          
-        if (fifo_wr_en) pkt_receive_sts <= 2'b01; // write success                   
-        else if (rx_pkt_valid & (!rx_ready)) pkt_receive_sts <= 2'b10; // overflow attempt
-    end
+    else if (fifo_wr_en) pkt_receive_sts <= 2'b01; // write success                   
+    else if (rx_pkt_valid & (!rx_ready)) pkt_receive_sts <= 2'b10; // overflow attempt
+    else pkt_receive_sts <= 2'b00;       
 
 always_ff @(posedge clk or negedge reset_n)
     if (!reset_n) credit_outstanding <= 5'h0;     // reset credit                    
