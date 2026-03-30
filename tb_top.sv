@@ -8,6 +8,7 @@ module tb_top_cxs_pktzr_depktzr_rx;
     logic rx_cxs_rst_n;               // Active-low rese
     // ---------------- INPUT SIGNALS ----------------
     logic tx_valid;                   // TX valid
+	logic reg_ack;
     logic rx_pkt_valid;               // Packet valid input
     logic [511:0] rx_pkt_data;        // Packet data input
     logic rx_cxs_crd_gnt;             // Credit grant
@@ -16,6 +17,7 @@ module tb_top_cxs_pktzr_depktzr_rx;
     // ---------------- OUTPUT SIGNALS ----------------
     logic rx_cxs_active_req;          // Active request
     logic rx_cxs_valid;               // Valid output
+	logic reg_req;
     logic [255:0] rx_cxs_data;        // Output data
     logic rx_ready;                   // Ready signal
     logic pkt_receive_sts_vld;        // Status valid
@@ -30,6 +32,8 @@ module tb_top_cxs_pktzr_depktzr_rx;
         .rx_cxs_clk           (rx_cxs_clk),
         .rx_cxs_rst_n         (rx_cxs_rst_n),
         .tx_valid             (tx_valid),
+		.reg_req              (req_req),
+		.reg_ack              (reg_ack),
         .rx_pkt_valid         (rx_pkt_valid),
         .rx_pkt_data          (rx_pkt_data),
         .rx_cxs_crd_gnt       (rx_cxs_crd_gnt),
@@ -54,6 +58,7 @@ module tb_top_cxs_pktzr_depktzr_rx;
         rx_cxs_clk             = 1'b0;
         rx_cxs_rst_n           = 1'b0;
         tx_valid               = 1'b0;
+		reg_ack                = 1'b0;
         rx_pkt_valid           = 1'b0;
         rx_pkt_data            = 512'h0;
         rx_cxs_crd_gnt         = 1'b0;
@@ -68,6 +73,8 @@ module tb_top_cxs_pktzr_depktzr_rx;
         // ---------- ENABLE TX ----------
         @(posedge rx_cxs_clk);
         tx_valid = 1'b1;
+		@(posedge rx_cxs_clk);
+		reg_ack  = 1'b1;
         // ---------- WAIT FOR READY ----------
         @(posedge rx_cxs_clk);
         @(posedge rx_cxs_clk);

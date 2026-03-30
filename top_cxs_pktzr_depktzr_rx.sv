@@ -10,6 +10,7 @@ module top_cxs_pktzr_depktzr_rx(
     input  rx_cxs_clk,                 // System clock
     input  rx_cxs_rst_n,               // Active-low reset
     input  tx_valid,                   // TX valid input
+	input  reg_ack,
     input  rx_pkt_valid,               // Incoming packet valid
     input  rx_cxs_crd_gnt,             // Credit grant from downstream
     input  rx_cxs_active_ack,          // Active acknowledge
@@ -21,6 +22,7 @@ module top_cxs_pktzr_depktzr_rx(
     output logic rx_cxs_valid,         // Valid output
     output logic rx_cxs_last,          // Last flit indicator
     output logic rx_cxs_crd_rtn,       // Credit return
+	output logic reg_req,
     output logic [1:0] pkt_receive_sts,// Packet status
     output logic [2:0]  rx_cxs_prcl_type, // Protocol type
     output logic [13:0] rx_cxs_cntl,      // Control field
@@ -53,6 +55,7 @@ module top_cxs_pktzr_depktzr_rx(
         .rx_ready            (rx_ready),            // Ready output
         .fifo_full           (fifo_full),           // FIFO full
         .fifo_empty          (fifo_empty),          // FIFO empty
+		.reg_ack            (reg_ack),
         .fifo_overflow       (fifo_overflow),       //FIFO overflow
         .fifo_underflow      (fifo_underflow),      //FIFO Underflow
         .fifo_out_valid      (fifo_out_valid),      // FIFO valid out
@@ -67,6 +70,7 @@ module top_cxs_pktzr_depktzr_rx(
         .reset_n             (rx_cxs_rst_n),        // Reset
         .tx_valid            (tx_valid),            // TX valid
         .rx_ready            (rx_ready),            // Ready
+		.reg_req             (reg_req),
         .fifo_empty          (fifo_empty),          // FIFO empty
         .fifo_full           (fifo_full),           // FIFO full
         .fifo_out_valid      (fifo_out_valid),      // FIFO valid

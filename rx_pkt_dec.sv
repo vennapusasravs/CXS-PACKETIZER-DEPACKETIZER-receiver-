@@ -13,7 +13,7 @@ module rx_pkt_dec (
     input        fifo_overflow,          // 1-bit overflow flag               
     input        fifo_underflow,         // 1-bit underflow flag              
     input  [511:0] fifo_data_out,        // 512-bit fifo output data          
-
+    output logic  reg_req,
     output logic        rx_cxs_active_req,   // 1-bit active request           
     output logic [2:0]  rx_cxs_prcl_type,    // 3-bit protocol type            
     output logic        rx_pkt_dec_vld,      // 1-bit decode valid             
@@ -64,6 +64,10 @@ assign cxs_cntl_rsvd_rx_vld = (fifo_out_valid & (fifo_data_out[43:14] == 30'h0))
 assign cxs_rsvd_rx_vld      = (fifo_out_valid & (fifo_data_out[253:49] == 205'h0));                    // reserved check          
 assign rx_pkt_dec_vld       = (cxs_cntl_rsvd_rx_vld & cxs_rsvd_rx_vld);                                 // decode valid            
 
+ always_ff @(posedge clk or negedge reset_n)
+    if(!reset_n) reg_req <= 1'b0;        
+    else          reg_req <= tx_valid;
+	
 always_ff @(posedge clk or negedge reset_n)
     if(!reset_n) {depkt_rx_data_vld,depkt_rx_data} <= 257'h0;                                           // reset depacket         
     else {depkt_rx_data_vld,depkt_rx_data} <= pkt_data_rx_vld ? {1'b1,pkt_data_rx[255:0]} : 257'h0;     // update depacket        

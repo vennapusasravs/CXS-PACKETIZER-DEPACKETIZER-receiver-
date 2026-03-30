@@ -2,7 +2,8 @@ module rx_fifo(
 
     input                clk,                     // 1-bit system clock                
     input                reset_n,                 // 1-bit active low reset           
-    input                tx_valid,                // 1-bit tx valid                   
+    input                tx_valid,                // 1-bit tx valid  
+    input                reg_ack,	
     input                rx_pkt_valid,            // 1-bit packet valid               
     input                rx_cxs_crd_gnt,          // 1-bit credit grant               
     input                rx_cxs_active_ack,       // 1-bit active ack                 
@@ -69,8 +70,8 @@ always_ff @(posedge clk or negedge reset_n)
 
 always_ff @(posedge clk or negedge reset_n)
     if (!reset_n) rx_ready <= 1'b0;               // reset ready                     
-    else if (!tx_valid | fifo_full) rx_ready <= 1'b0; // not ready                   
-    else if (tx_valid & (!fifo_full)) rx_ready <= 1'b1; // ready                     
+    else if (!tx_valid | fifo_full |(!reg_ack)) rx_ready <= 1'b0; // not ready                   
+    else if (tx_valid & (!fifo_full)& reg_ack) rx_ready <= 1'b1; // ready                     
 
 always_ff @(posedge clk or negedge reset_n)
     if (!reset_n) fifo_mem[wr_ptr] <= 512'h0;     // reset memory                    
